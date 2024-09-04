@@ -1,0 +1,43 @@
+    ### Setup Spark on MacOS
+        # Download tar.gz from Apache Spark site
+        # Go to terminal
+        # pwd
+        # /Users/anandzaveri/evfiles/spark3
+        # tar -zxvf spark-3.5.2-bin-hadoop3.tgz
+        # vi ~/.zshrc
+        # set up SPARK_HOME
+        # export SPARK_HOME=/Users/anandzaveri/evfiles/spark3
+        # export PATH=$PATH:$SPARK_HOME/bin
+        # export PYSPARK_PYTHON=python3
+        # export PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH
+
+    ### Get All the variables
+        # Refer get_all_variables.py
+
+    ### Get Spark Object
+        # Validate Spark Object
+        # Set up Logging configuration mechanism
+        # set up error handling
+
+    ### Initiate run_presc_data_ingest script
+        # Load the city file
+        # Load the Prescriber fact file
+        # validate
+        # Set up Logging configuration mechanism
+        # set up error handling
+
+    ### Initiate run_presc_data_preprocessing script
+        # Perform data cleaning operation for df_city
+        # select only required columns
+        # convert city, state and country fields to upper case
+        # validate
+        # setup error handling
+        # Set up Logging configuration mechanism
+
+    ### Initiate run_presc_data_transform script
+        # Apply all the transformation logics
+        # validate
+        # Set up Logging configuration mechanism
+
+    ### Initiate run_data_extraction script
+        # validate
