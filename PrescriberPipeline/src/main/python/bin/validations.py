@@ -22,10 +22,11 @@ def df_count(df, dfName):
         df_count = df.count()
         logger.info(f"The dataframe count is {df_count}")
     except Exception as exp:
-        logger.error("Error in the method df_count(). Please check stack trace. " + str(exp), exc_info=True)
+        logger.error(f"Error in the method df_count() for dataframe {dfName}. Please check stack trace. "
+                     + str(exp), exc_info=True)
         raise
     else:
-        logger.info("The dataframe validation by df_count() is completed... ")
+        logger.info(f"The dataframe {dfName} validation by df_count() is completed... ")
 
 
 def df_top10_rec(df, dfName):
@@ -35,7 +36,21 @@ def df_top10_rec(df, dfName):
         df_pandas=df.limit(10).toPandas()
         logger.info('\n \t' + df_pandas.to_string(index=False))
     except Exception as exp:
-        logger.error("Error in the method df_top10_rec(). Please check stack trace. " + str(exp), exc_info=True)
+        logger.error(f"Error in the method df_top10_rec() for dataframe {dfName}. Please check stack trace. " + str(exp), exc_info=True)
         raise
     else:
-        logger.info("The dataframe validation by df_top10_rec() is completed... ")
+        logger.info(f"The dataframe {dfName} validation by df_top10_rec() is completed... ")
+
+
+def df_print_schema(df, dfName):
+    try:
+        logger.info(f"The dataframe print by df_print_schema has started... ")
+        sch = df.schema.fields
+        logger.info(f"The dataframe {dfName} schema is: ")
+        for i in sch:
+            logger.info(f"\t{i}")
+    except Exception as exp:
+        logger.error("Error in the method df_print_schema(). Please check stack trace. " + str(exp), exc_info=True)
+        raise
+    else:
+        logger.info(f"The dataframe print by df_print_schema has completed... ")

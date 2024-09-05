@@ -3,7 +3,7 @@ import sys
 
 import get_all_variables as gav
 from create_objects import get_spark_object
-from validations import get_curr_date, df_count, df_top10_rec
+from validations import get_curr_date, df_count, df_top10_rec, df_print_schema
 from presc_run_data_ingest import load_files
 from presc_run_data_preprocessing import perform_data_clean
 import logging
@@ -72,12 +72,14 @@ def main():
         # Perform data cleaning operation for df_city
         # select only required columns
         # convert city, state and country fields to upper case
-        df_city_sel, df_fact_sel = perform_data_clean(df_city)
+        df_city_sel, df_fact_sel = perform_data_clean(df_city, df_fact)
         # validate
         df_count(df_city_sel, 'df_city_sel')
         df_top10_rec(df_city_sel, 'df_city_sel')
         df_count(df_fact_sel, 'df_fact_sel')
         df_top10_rec(df_fact_sel, 'df_fact_sel')
+
+        df_print_schema(df_fact_sel, 'df_fact_sel')
 
         logging.info("run_presc_pipelie is Completed...")
 

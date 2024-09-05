@@ -41,3 +41,16 @@
 
     ### Initiate run_data_extraction script
         # validate
+
+
+### The command to check the count of null or NaN values of all columns in a dataframe is as follows:
+
+df_fact_select = df_fact_select\
+            .select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in df_fact_select.columns]).show()
+
+    # output:
++--------+----------+-----------+-----------+--------+---------+-------+----------------+---------------+------------+--------------+
+|presc_id|presc_city|presc_state|presc_spclt|year_exp|drug_name|trx_cnt|total_day_supply|total_drug_cost|country_name|presc_fullname|
++--------+----------+-----------+-----------+--------+---------+-------+----------------+---------------+------------+--------------+
+|       0|         0|          0|          0|       0|        3|      6|               0|              0|           0|             0|
++--------+----------+-----------+-----------+--------+---------+-------+----------------+---------------+------------+--------------+
