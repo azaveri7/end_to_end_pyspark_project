@@ -1,4 +1,4 @@
-#!/Users/anandzaveri/repos/courses/end_to_end_pyspark_project/PrescriberPipeline/bin/python3.10
+#!/Users/anandzaveri/repos/courses/end_to_end_pyspark_project/PrescriberPipeline/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys
