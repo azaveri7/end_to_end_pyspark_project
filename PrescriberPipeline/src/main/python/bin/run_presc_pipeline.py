@@ -6,7 +6,7 @@ from create_objects import get_spark_object
 from validations import get_curr_date, df_count, df_top10_rec, df_print_schema
 from presc_run_data_ingest import load_files
 from presc_run_data_preprocessing import perform_data_clean
-from presc_run_data_transform import city_report
+from presc_run_data_transform import city_report, top_5_Prescribers
 import logging
 import logging.config
 
@@ -85,9 +85,12 @@ def main():
         ### Initiate run_presc_data_transform script
         # Develop city and prescriber reports
         df_city_final = city_report(df_city_sel, df_fact_sel)
+        df_presc_final = top_5_Prescribers(df_fact_sel)
         # validate
         df_top10_rec(df_city_final, 'df_city_final')
         df_print_schema(df_city_final, 'df_city_final')
+        df_top10_rec(df_presc_final, 'df_presc_final')
+        df_print_schema(df_presc_final, 'df_presc_final')
         # setup logging mechanism configuration
 
 

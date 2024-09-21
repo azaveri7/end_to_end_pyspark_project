@@ -16,7 +16,7 @@
     # total trx counts
 """
 
-from pyspark.sql.functions import upper, size, countDistinct, sum
+from pyspark.sql.functions import upper, size, countDistinct, sum, dense_rank, col
 from pyspark.sql.window import Window
 from udfs import column_split_cnt
 
@@ -45,3 +45,35 @@ def city_report(df_city_sel, df_fact_sel):
     else:
         logger.info("city_report is complete...")
     return df_city_final
+
+
+# Prescriber Report
+# Top 5 Prescribers with highest trx_cnt per each state
+# Consider the prescribers only from 20 to 50 years of experience
+# Layout:
+
+    # Prescriber ID
+    # Prescriber full name
+    # Prescriber state
+    # Prescriber country
+    # Prescriber years of experience
+    # Prescriber trx count
+    # Prescriber days supply
+    # Prescriber drug cost
+def top_5_Prescribers(df_fact_sel):
+    try:
+        logger.info("Transform - top_5_Prescribers() is started...")
+        spec = Window.partitionBy("presc_state").orderBy(col("trx_cnt").desc())
+        df_presc_final = df_fact_sel.select("presc_id", "presc_fullname", \
+                                            "presc_state", "country_name", "year_exp", "trx_cnt", "total_day_supply", "total_drug_cost") \
+                            .filter((df_fact_sel.year_exp >= 20) & (df_fact_sel.year_exp <= 50)) \
+                            .withColumn("dense_rank", dense_rank().over(spec)) \
+                            .filter(col("dense_rank") <= 5) \
+                            .select("presc_id", "presc_fullname", "presc_state", "country_name", "year_exp", "trx_cnt", \
+                                "total_day_supply", "total_drug_cost")
+    except Exception as exp:
+        logger.error("Error in method top_5_Prescribers " + str(exp), exc_info=True)
+        raise
+    else:
+        logger.info("Transform - top_5_Prescribers() is completed...")
+    return df_fact_sel
