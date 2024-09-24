@@ -1,3 +1,367 @@
+    ### Setup instance in GCP
+        # Create atleast 4 CPU and 16 GB RAM
+        # Once the instance is created, go to Network Settings -> External IP addresses
+        # Delete the static ip and keep the Ephemeral
+        # Click on the Ephemeral ip address RESERVE button which makes ip static
+        # Ephemeral type changes to static
+        # Click on Open in browser console
+
+    ### Setup Python and Java in the VM
+        # python is pre-installed but pip is not.
+        # sudo apt update
+        # sudo apt install python3-pip
+        # sudo apt install python3-venv
+        # To test venv
+            python3 -m venv tutorial-env
+            ls -lrt
+            rm -f tutorial-env
+        # sudo apt-get install openjdk-8-jdk
+        # java -version
+        # javac -version
+
+
+    ### Setting up Secure Connect to VM
+        # ssh
+        # ls -ltra
+        # cd .ssh
+        # ls -ltr
+        # ssh-keygen
+        # cd .ssh
+        # ls -lrt
+            now there will be a public and private key
+            id_rsa.pub
+            id_rsa
+        # cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+        # ls -lrt
+            id_rsa.pub
+            id_rsa
+            authorized_keys
+        #  cd
+        # ssh localhost
+        # now we will be able to connect to localhost without any pwd
+
+    ### Hadoop, HDFS, YARN setup
+        # wget https://mirrors.giganet.com/apache/hadoop/common/hadoop-3.3.1/hadoop-3.3.1.tar.gz
+        # ls -lrt
+        # tar xfz hadoop-3.3.1.tar.gz
+        # ls -lrt
+        # mkdir softwares
+        # mv hadoop-3.3.1.tar.gz softwares
+        # ls -lrt
+        # sudo mv -f hadoop-3.3.1 /opt
+        # cd /opt
+        # ls -lrt
+        # echo $USER
+        # sudo chown ${USER}:${USER} -R /opt/hadoop-3.3.1
+        # sudo ln -s /opt/hadoop-3.3.1 /opt/hadoop
+        # ls -lrta
+        # vi .profile
+        # ADD below 3 lines:
+            export HADOOP_HOME=/opt/hadoop
+            export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+            export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+        # source .profile
+        # echo $JAVA_HOME
+        # echo $PATH
+        # echo HADOOP_HOME
+        # cd /opt/hadoop
+        # cd etc
+        # cd hadoop
+        # ls -lrt *core*
+        # vi core-site.xml
+        # Clean the entire file and ADD below lines:
+           <configuration>
+                <property>
+                    <name>fs.defaultFS</name>
+                    <value>hdfs://localhost:9000</value>
+                </property>
+           </configuration>
+        # ls -lrt *hdfs*
+        # vi hdfs-site.xml
+        # Clean the entire and ADD below lines
+            <configuration>
+                <property>
+                    <name>dfs.namenode.name.dir</name>
+                    <value>/opt/hadoop/dfs/name</value>
+                </property>
+                <property>
+                    <name>dfs.namenode.checkpoint.dir</name>
+                    <value>/opt/hadoop/dfs/namesecondary</value>
+                </property>
+                <property>
+                    <name>dfs.datanode.data.dir</name>
+                    <value>/opt/hadoop/dfs/data</value>
+                </property>
+                <property>
+                    <name>dfs.replication</name>
+                    <value>1</value>
+                </property>
+                <property>
+                    <name>dfs.blocksize</name>
+                    <value>134217728</value>
+                </property>
+           </configuration>
+            
+        # ls -lrt *hadoop*
+        # vi hadoop-env.sh
+        # ADD below lines:
+            export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+            export HADOOP_OS_TYPE=${HADOOP_OS_TYPE:-$uname -s)}
+        # cd /opt/hadoop/dfs
+            /opt/hadoop/dfs: No such file or directory
+
+        # hdfs namenode -format
+        # cd /opt/hadoop/dfs
+        # ls -lrt
+        # cd name
+        # cd current
+        # cd
+        # Start the namenode
+            start-dfs.sh
+        # jps
+            shows list of all the services running
+            - SecondaryNameNode
+            - Jps
+            - DataNode
+            - NameNode
+        # Test HDFS with below commands
+            hadoop fs -ls /
+            hadoop fs -mkdir -p /user/${USER}
+            hadoop fs -ls /
+            hadoop fs -ls -r /
+            hadoop fs -ls /user
+            ls -lrt
+            cat text.txt
+            hadoop fs -copyFromLocal text.txt /user/easylearningspark1
+            hadoop fs -ls /user/easylearningspark1
+            cd /opt/hadoop/etc/hadoop/
+
+        # Setup YARN
+            ls -lrt *yarn*
+            vi yarn-site.xml
+            Clean the file and add below lines
+            <configuration>
+                <property>
+                    <name>yarn.nodemanager.aux-services</name>
+                    <value>mapreduce_shuttle</value>
+                </property>
+                <property>
+                    <name>yarn.nodemanager.env-whitelist</name>
+                    <value>HADOOP_COMMON_HOME, HADOOP_HDFS_HOME, JAVA_HOME, HADOOP_CONF_DIR, CLASSPATH_PREPEND_DISTCACHE,
+                    HADOOP_YARN_HOME, HADOOP_MAPRED_HOME</value>
+                </property>
+            </configuration>
+
+            vi mapred-site.xml
+
+            <configuration>
+                <property>
+                    <name>mapreduce.framework.name</name>
+                    <value>yarn</value>
+                </property>
+                <property>
+                    <name>mapreduce.application.classpath</name>
+                    <value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value>
+                </property>
+            </configuration>
+
+            start-yarn.sh
+            jps
+            - ResourceManager
+            - SecondaryNameNode
+            - NodeManager
+            - Jps
+            - DataNode
+            - NameNode
+
+            # ls -lrt *stop*
+            # stop-yarn.sh
+            # jps
+            # stop-dfs.sh
+            # jps
+            # start-dfs.sh
+            # start-yarn.sh
+            # jps
+
+    ### Setup Docker, Postgres and Hive
+
+       # Setup Docker and Postgres and connect them
+
+           - sudo apt update
+           - sudo apt install apt-transport-https ca-certificates curl software-properties-common
+           - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+           - sudo add-apt-repository "deb [arch-amd64] https://download.docker.com/linux/ubuntu bionic stable"
+           - sudo apt update
+           - apt-cache policy docker-ce
+           - sudo apt install docker-ce
+           - sudo systemctl status docker
+           - sudo docker images
+           - echo $USER
+           - sudo usermod -aG docker ${USER}
+           - exit
+           Login back to VM
+           - id ${USER}
+           you should see the entry 999(docker), meaning user is part of docker
+
+           check if you can download docker images from docker hub
+
+           - docker run hello-world
+
+           - docker create --name postgres_container -p 6432:5432 -e POSTGRES_PASSWORD=sibaram12 postgres
+
+           - docker start postgres_container
+           - docker logs -f postgres_container
+           - docker exec -it postgres_container psql -U postgres
+           - postgres-# CREATE DATABASE metastore
+           - postgres-# CREATE USER hive WITH ENCRYPTED PASSWORD 'sibaram12'
+           - postgres-# GRANT ALL ON DATABASE metastore TO hive;
+           - postgres-# \l
+           - postgres-# \q
+
+       # Install Postgres client
+
+           - sudo apt install postgresql-client -y
+           - psql -h localhost -p 6432 -d metastore -U hive -W
+
+           Asks for password
+           sibaram12
+
+           metastore=> \d
+           metastore=> \q
+
+       # Setup Hive
+
+            - wget https://mirrors.ocf.berkeley.edu/apache/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz
+            - tar xzf apache-hive-3.1.2-bin.tar.gz
+            - mv apache-hive-3.1.2-bin.tar.gz softwares
+            - sudo mv -f apache-hive-3.1.2-bin /opt
+            - cd /opt
+            - ls -lrt
+            - sudo ln -s /opt/apache-hive-3.1.2-bin /opt/hive
+            - ls -lrt
+            - cd
+            - ls -lrta
+            - vi .profile
+            export HIVE_HOME=/opt/hive
+            export PATH=$PATH:${HIVE_HOME}/bin
+
+            - source .profile
+            - echo $HIVE_HOME
+            - echo $PATH
+
+            - cd /opt/hive
+            - ls -lrt
+            - cd conf
+            - vi hive-site.xml
+
+            add below lines
+            <configuration>
+                <property>
+                    <name>javax.jdo.option.CoonectionURL</name>
+                    <value>jdbc:postgresql://localhost:6432/metastore</value>
+                    <description>JDBC Driver Connection for PostgreSQL</description>
+                </property>
+                <property>
+                    <name>javax.jdo.option.CoonectionDriverName</name>
+                    <value>org.postgresql.Driver</value>
+                    <description>PostgreSQL metastore driver class name</description>
+                </property>
+                <property>
+                    <name>javax.jdo.option.CoonectionUserName</name>
+                    <value>hive</value>
+                    <description>Database User Name</description>
+                </property>
+                <property>
+                    <name>javax.jdo.option.CoonectionPassword</name>
+                    <value>sibaram13</value>
+                    <description>Database User Password</description>
+                </property>
+            </configuration>
+
+            - cd
+            - cd /opt/hive/lib/
+            - ls -lrt guava*
+            - rm quava-19.0.jar
+            - ls -lrt /opt/hadoop/share/hadoop/hdfs/lib/quav*
+            - cp /opt/hadoop/share/hadoop/hdfs/lib/quava-27.0-jre.jar /opt/hive/lib/
+            - wget https://jdbc.postgresql.org/download/postgresql-42.2.24.jar
+            - ls -lrt postgresql-42.2.24.jar
+
+       # Initialize hive metastore
+
+            - schematool -dbType postgres -initSchema
+            - docker exec -it postgres_container -d metastore
+
+            - metastore=# \d
+
+            We can see a lot of metadata tables created.
+
+            - metastore=# \q
+
+       # To check if hive cli is working
+
+            - hive
+
+            hive> CREATE DATABASE TEST;
+            hive> USE TEST;
+            hive> CREATE TABLE SPARK(COL int);
+            hive> insert into SPARK values(10);
+            hive> select count(*) from spark;
+
+
+
+    ### Setup Spark 2.x and 3.x
+            - vi .profile
+            add below lines
+
+            export PYSPARK_PYTHON=python3
+            - vi /opt/hive/conf/hive-site.xml
+
+            add below lines:
+
+            <property>
+                <name>hive.metastore.schema.verification</name>
+                <value>false</value>
+            </property>
+
+            - wget https://downloads.apache.org/spark/spark-2.4.8/spark-2.4.8-bin-hadoop2.7.tgz
+            - wget https://ftp.wayne.edu/apache/spark/spark-3.2.0/spark-3.2.0-bin-hadoop3.2.tgz
+
+
+
+
+
+    ### Start and Stop cluster gracefully
+
+        - jps
+        - vi stop-all.sh
+
+        Inside file,
+
+           stop-yarn.sh
+           stop-dfs.sh
+           jps
+
+        - stop-all.sh
+        - vi start-all.sh
+
+        Inside file,
+
+            start-dfs.sh
+            start-yarn.sh
+            docker start postgres_container
+            jps
+
+        - start-all.sh
+        - jps
+        - sudo systemctl status docker
+        - stop-all.sh
+
+
+
+
+
+
     ### Setup Spark on MacOS
         # Download tar.gz from Apache Spark site
         # Go to terminal

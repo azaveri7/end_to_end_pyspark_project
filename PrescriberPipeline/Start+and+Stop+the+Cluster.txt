@@ -1,0 +1,15 @@
+### Let's Stop the Cluster
+--Create a file stop-all.sh
+stop-yarn.sh
+stop-dfs.sh
+jps
+
+### Start the Cluster. 
+--Create a file start-all.sh
+start-dfs.sh
+start-yarn.sh
+docker start postgress_container
+jps
+
+### If you get the error - Permission denied (publickey).
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
